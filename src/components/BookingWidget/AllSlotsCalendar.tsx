@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import esLocale from '@fullcalendar/core/locales/es';
@@ -9,29 +9,43 @@ import { format } from 'date-fns';
 interface Props { onSelectDate: (date: string) => void }
 
 export default function AllSlotsCalendar({ onSelectDate }: Props) {
+  const ref = useRef<FullCalendar | null>(null);
+
+  const handleClick = (info: any) => {
+    const cell = info.dayEl as HTMLElement;
+
+    // bloquear días pasados o celdas deshabilitadas
+    if (cell.classList.contains('fc-day-past')) return;
+
+    // elimina highlight anterior
+    document
+      .querySelectorAll('.selected-day')
+      .forEach((el) => el.classList.remove('selected-day'));
+
+    // aplica highlight actual
+    cell.classList.add('selected-day');
+
+    onSelectDate(format(info.date, 'yyyy-MM-dd'));
+  };
+
   return (
     <FullCalendar
-        plugins={[dayGridPlugin, interactionPlugin]}
-        initialView="dayGridMonth"
-        firstDay={1}
-        height="auto"
-        headerToolbar={{
+      ref={ref}
+      plugins={[dayGridPlugin, interactionPlugin]}
+      initialView="dayGridMonth"
+      headerToolbar={{
         left: 'prev,next',
         center: 'title',
         right: ''
-    }}          
-
-        locale={esLocale}
-      selectable
-      dateClick={(info) => onSelectDate(format(info.date, 'yyyy-MM-dd'))}
-      dayCellClassNames={({ isPast, date }) => [
-        'cursor-pointer text-sm',
-        isPast ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'hover:bg-amber-50',
-      ]}
-      dayCellDidMount={(arg) => {
-        // día seleccionado -> ring amber
-        arg.el.classList.remove('fc-day-today');
       }}
+      firstDay={1}
+      height="auto"
+      selectable
+      dateClick={handleClick}
+      locale={esLocale}
+      dayMaxEventRows={0}
+      showNonCurrentDates
+      fixedWeekCount={false}
     />
   );
 }

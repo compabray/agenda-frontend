@@ -4,6 +4,7 @@ import { useFetch } from '../../hooks/useFetch';
 import AllSlotsCalendar from './AllSlotsCalendar';
 import AvailableList from './AvailableList';
 import type { AvailableResponse } from './types';
+import {format} from 'date-fns'
 
 interface Props { businessId: string; }
 
@@ -60,7 +61,7 @@ export default function BookingWidget({ businessId }: Props) {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-title text-3xl text-gray-900">Agenda tu turno aquí</h1>
+   
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendario */}
@@ -79,7 +80,7 @@ export default function BookingWidget({ businessId }: Props) {
               {loading ? (
                 <p className="text-gray-500">Cargando…</p>
               ) : (
-                <AvailableList slots={slots ?? []} onSelect={handleSelectTime} />
+                <AvailableList slots={slots ?? []} selected={selectedTime} onSelect={handleSelectTime} />
               )}
             </>
           )}
@@ -87,9 +88,10 @@ export default function BookingWidget({ businessId }: Props) {
           {/* Formulario */}
           {selectedTime && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-700">
-                Turno: <strong>{selectedDate} {selectedTime}</strong>
-              </p>
+                <p className="text-sm text-gray-700">
+                    Turno del día: <strong>{format(new Date(selectedDate!), 'dd/MM/yyyy')}</strong><br/>
+                    Hora: <strong>{selectedTime}</strong>
+                </p>
               <input
                 type="text"
                 placeholder="Tu nombre"
@@ -107,7 +109,7 @@ export default function BookingWidget({ businessId }: Props) {
               <button
                 disabled={!name || !phone}
                 onClick={handleSubmit}
-                className="w-full bg-amber-500 text-white py-2 rounded-lg hover:bg-amber-600 transition-shadow shadow-md disabled:opacity-50"
+                className="w-full bg-sky-600 text-white py-2 rounded-lg hover:bg-sky-700 transition-shadow shadow-md disabled:opacity-50"
               >
                 Confirmar reserva
               </button>

@@ -1,11 +1,13 @@
 import React from 'react';
 
-interface Props { slots: string[]; onSelect: (t: string) => void; }
+interface Props {
+  slots: string[];
+  selected: string | null;
+  onSelect: (t: string) => void;
+}
 
-export default function AvailableList({ slots, onSelect }: Props) {
-  if (!slots.length) {
-    return <p className="text-gray-500 text-sm">No hay turnos disponibles hoy.</p>;
-  }
+export default function AvailableList({ slots, selected, onSelect }: Props) {
+  if (!slots.length) return <p className="text-gray-500 text-sm">No hay turnos disponibles hoy.</p>;
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -13,7 +15,7 @@ export default function AvailableList({ slots, onSelect }: Props) {
         <button
           key={t}
           onClick={() => onSelect(t)}
-          className="py-2 border-2 border-amber-500 rounded-lg text-amber-600 hover:bg-amber-100 transition-colors text-sm"
+          className={`btn-slot ${selected === t ? 'btn-slot-selected' : ''}`}
         >
           {t}
         </button>

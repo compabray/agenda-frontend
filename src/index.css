@@ -11,32 +11,56 @@
   }
 }
 
-/* ──────────────────────────────── */
-/* FullCalendar overrides           */
-@layer components {
-  /* Cada celda del calendario */
-  .fc .fc-daygrid-day {
-    @apply p-2 border border-gray-200 rounded-sm;
-  }
-  /* Hover sobre celda habilitada */
-  .fc .fc-daygrid-day:not(.fc-day-past):hover {
-    @apply bg-amber-50 cursor-pointer;
-  }
-  /* Días pasados */
-  .fc .fc-daygrid-day.fc-day-past {
-    @apply bg-gray-100 text-gray-400 cursor-not-allowed;
-  }
-  /* Día de hoy */
-  .fc .fc-daygrid-day.fc-day-today {
-    @apply ring-2 ring-amber-500;
-  }
-  /* Cabeceras Mon/Tue… */
-  .fc .fc-col-header-cell-cushion {
-    @apply text-gray-600 font-medium;
-  }
-  /* Quitar “today” button y bordes extra */
-  .fc .fc-toolbar-chunk:first-child,
-  .fc .fc-button.fc-button-today {
-    display: none;
+/* ───────── Paleta Clínica ───────── */
+@layer base {
+  html, body {
+    @apply bg-gray-50 text-gray-900 font-sans;
   }
 }
+
+/* ───────── FullCalendar tweaks ───────── */
+@layer components {
+  /* cada día = 38 px alto móvil, 56 px desktop  */
+  .fc .fc-daygrid-day-frame {
+    @apply flex items-center justify-center h-16 md:h-20;
+  }
+  .fc .fc-daygrid-day {
+    @apply border border-gray-200 relative;
+  }
+  /* nro centrado */
+  .fc .fc-daygrid-day-number {
+    @apply text-sm;
+  }
+  /* Día pasado o bloqueado */
+  .fc .fc-day-past,
+  .fc .fc-day-disabled {
+    @apply bg-gray-200 text-gray-400 pointer-events-none;
+  }
+  /* Hover + foco */
+  .fc .fc-daygrid-day:not(.fc-day-past):hover::after {
+    content: '';
+    @apply absolute inset-0 bg-sky-100 opacity-60 cursor-pointer;
+  }
+  /* Día seleccionado (1 px border + fondo) */
+  .fc .selected-day::after {
+    content: '';
+    @apply absolute inset-0 ring-1 ring-sky-600 bg-sky-100 opacity-60 rounded-sm;
+  }
+
+  /* Cabecera Mon/Tue… */
+  .fc .fc-col-header-cell-cushion {
+    @apply text-gray-600 font-medium text-xs md:text-sm;
+  }
+}
+
+/* ───────── Botones de slot ───────── */
+.btn-slot {
+  @apply py-2 border border-sky-600 rounded-lg text-sky-700 hover:bg-sky-100 transition-colors text-sm cursor-pointer;
+}
+.btn-slot-selected {
+  @apply border border-sky-600 bg-sky-100 text-sky-700;
+}
+.btn-slot-disabled {
+  @apply py-2 border border-gray-300 rounded-lg text-gray-400 bg-gray-100 cursor-not-allowed text-sm;
+}
+
