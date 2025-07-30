@@ -1,66 +1,178 @@
 /* src/index.css */
 @import "tailwindcss";
 
-/*@tailwind base;
-@tailwind components;
-@tailwind utilities;*/
-
 @layer base {
   html, body {
     @apply bg-gray-50 m-0 p-0 font-sans text-gray-900;
   }
-}
-
-/* ───────── Paleta Clínica ───────── */
-@layer base {
-  html, body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+  
+  * {
+    @apply box-border;
   }
 }
 
-/* ───────── FullCalendar tweaks ───────── */
+/* ───────── Modern FullCalendar Styles ───────── */
 @layer components {
-  /* cada día = 38 px alto móvil, 56 px desktop  */
+  /* Calendar container */
+  .fc {
+    @apply bg-white rounded-lg shadow-sm;
+  }
+  
+  /* Header styling */
+  .fc .fc-toolbar {
+    @apply mb-4;
+  }
+  
+  .fc .fc-toolbar-title {
+    @apply text-xl font-semibold text-gray-900 capitalize;
+  }
+  
+  .fc .fc-button {
+    @apply bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 px-3 py-2 rounded-lg shadow-sm transition-all duration-200;
+  }
+  
+  .fc .fc-button:hover {
+    @apply shadow-md;
+  }
+  
+  .fc .fc-button:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  /* Day cells */
   .fc .fc-daygrid-day-frame {
-    @apply flex items-center justify-center h-16 md:h-20;
+    @apply flex items-center justify-center h-12 md:h-14 relative;
   }
+  
   .fc .fc-daygrid-day {
-    @apply border border-gray-200 relative;
+    @apply border border-gray-100 relative transition-all duration-200;
   }
-  /* nro centrado */
+  
+  /* Day numbers */
   .fc .fc-daygrid-day-number {
-    @apply text-sm;
+    @apply text-sm font-medium z-10 relative;
   }
-  /* Día pasado o bloqueado */
-  .fc .fc-day-past,
-  .fc .fc-day-disabled {
-    @apply bg-gray-200 text-gray-400 pointer-events-none;
+  
+  /* Past days */
+  .fc .fc-day-past {
+    @apply bg-gray-50 text-gray-400;
   }
-  /* Hover + foco */
+  
+  .fc .fc-day-past .fc-daygrid-day-number {
+    @apply text-gray-300;
+  }
+  
+  /* Future/available days */
+  .fc .fc-daygrid-day:not(.fc-day-past) {
+    @apply hover:bg-blue-50 cursor-pointer;
+  }
+  
   .fc .fc-daygrid-day:not(.fc-day-past):hover::after {
     content: '';
-    @apply absolute inset-0 bg-sky-100 opacity-60 cursor-pointer;
+    @apply absolute inset-0 bg-blue-100/50 transition-all duration-200;
   }
-  /* Día seleccionado (1 px border + fondo) */
+  
+  /* Selected day */
+  .fc .selected-day {
+    @apply bg-blue-100 border-blue-300;
+  }
+  
+  .fc .selected-day .fc-daygrid-day-number {
+    @apply text-blue-700 font-semibold;
+  }
+  
   .fc .selected-day::after {
     content: '';
-    @apply absolute inset-0 ring-1 ring-sky-600 bg-sky-100 opacity-60 rounded-sm;
+    @apply absolute inset-0 ring-2 ring-blue-500 ring-inset bg-blue-50;
   }
 
-  /* Cabecera Mon/Tue… */
+  /* Header days (Mon, Tue, etc.) */
+  .fc .fc-col-header-cell {
+    @apply bg-gray-50 border-b-2 border-gray-200;
+  }
+  
   .fc .fc-col-header-cell-cushion {
-    @apply text-gray-600 font-medium text-xs md:text-sm;
+    @apply text-gray-600 font-semibold text-xs md:text-sm uppercase tracking-wide py-2;
+  }
+  
+  /* Today highlighting */
+  .fc .fc-day-today {
+    @apply bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200;
+  }
+  
+  .fc .fc-day-today .fc-daygrid-day-number {
+    @apply text-amber-700 font-bold;
+  }
+  
+  /* Remove default FC styles that conflict */
+  .fc .fc-daygrid-day.fc-day-today {
+    background-color: transparent !important;
+  }
+  
+  /* Weekend styling */
+  .fc .fc-day-sat,
+  .fc .fc-day-sun {
+    @apply bg-gray-50;
   }
 }
 
-/* ───────── Botones de slot ───────── */
-.btn-slot {
-  @apply py-2 border border-sky-600 rounded-lg text-sky-700 hover:bg-sky-100 transition-colors text-sm cursor-pointer;
-}
-.btn-slot-selected {
-  @apply border border-sky-600 bg-sky-100 text-sky-700;
-}
-.btn-slot-disabled {
-  @apply py-2 border border-gray-300 rounded-lg text-gray-400 bg-gray-100 cursor-not-allowed text-sm;
+/* ───────── Custom Animations ───────── */
+@layer utilities {
+  .animate-fade-in {
+    @apply animate-pulse;
+  }
+  
+  .gradient-border {
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(45deg, #3b82f6, #8b5cf6) border-box;
+    border: 2px solid transparent;
+  }
 }
 
+/* ───────── Smooth Scrolling ───────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+}
+
+/* ───────── Focus States ───────── */
+@layer utilities {
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+}
+
+/* ───────── Loading States ───────── */
+@layer components {
+  .loading-pulse {
+    @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%];
+    animation: loading-shimmer 1.5s infinite;
+  }
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
