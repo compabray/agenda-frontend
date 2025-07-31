@@ -12,6 +12,7 @@ interface Props {
 }
 
 export default function BookingWidget({ businessId }: Props) {
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [name, setName] = useState('');
@@ -32,11 +33,21 @@ export default function BookingWidget({ businessId }: Props) {
     setSelectedDate(date);
     setSelectedTime(null);
     setMessage(null);
+    setStep(2); // Automáticamente ir al paso 2
   };
 
   const handleSelectTime = (time: string) => {
     setSelectedTime(time);
     setMessage(null);
+    setStep(3); // Automáticamente ir al paso 3
+  };
+
+  const handleGoBack = () => {
+    if (step === 2) {
+      setStep(1);
+    } else if (step === 3) {
+      setStep(2);
+    }
   };
 
   const handleSubmit = async () => {
@@ -54,11 +65,12 @@ export default function BookingWidget({ businessId }: Props) {
       setSelectedTime(null);
       setName('');
       setPhone('');
-      fetchSlots();
+      setStep(1);
+      setSelectedDate(null);
     } catch (err: any) {
       if (err.response?.status === 409) {
         setMessage('conflict');
-        fetchSlots();
+        setStep(2); // Volver al paso 2 para seleccionar otro horario
       } else {
         setMessage('error');
       }
@@ -80,182 +92,169 @@ export default function BookingWidget({ businessId }: Props) {
     <div className="space-y-8">
       {/* Progress Steps */}
       <div className="flex items-center justify-center space-x-4">
-        <div className={`flex items-center space-x-2 ${selectedDate ? 'text-blue-600' : 'text-gray-400'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${selectedDate ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+        <div className={`flex items-center space-x-2 ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
             1
           </div>
           <span className="hidden sm:inline text-sm font-medium">Elegí la fecha</span>
         </div>
         <div className="w-8 h-px bg-gray-300"></div>
-        <div className={`flex items-center space-x-2 ${selectedTime ? 'text-blue-600' : 'text-gray-400'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${selectedTime ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+        <div className={`flex items-center space-x-2 ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
             2
           </div>
           <span className="hidden sm:inline text-sm font-medium">Elegí el horario</span>
         </div>
         <div className="w-8 h-px bg-gray-300"></div>
-        <div className={`flex items-center space-x-2 ${name && phone ? 'text-blue-600' : 'text-gray-400'}`}>
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${name && phone ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
+        <div className={`flex items-center space-x-2 ${step >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}>
             3
           </div>
           <span className="hidden sm:inline text-sm font-medium">Confirmá</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-        {/* Calendar Section */}
-        <div className="xl:col-span-1 space-y-4">
-          <div className="flex items-center space-x-3">
+      {/* Back Button - Solo mostrar en steps 2 y 3 */}
+      {step > 1 && (
+        <div className="flex justify-start">
+          <button
+            onClick={handleGoBack}
+            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="text-sm font-medium">Volver atrás</span>
+          </button>
+        </div>
+      )}
+
+      {/* Step 1: Calendar */}
+      {step === 1 && (
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center space-x-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Calendario</h2>
-              <p className="text-sm text-gray-600">Seleccioná el día</p>
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-gray-900">Seleccioná tu fecha</h2>
+              <p className="text-sm text-gray-600 mt-1">Elegí el día que te convenga</p>
             </div>
           </div>
           
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
             <AllSlotsCalendar onSelectDate={handleSelectDate} />
           </div>
         </div>
+      )}
 
-        {/* Time Selection Section */}
-        <div className="xl:col-span-1 space-y-4">
-          {selectedDate ? (
-            <>
+      {/* Step 2: Time Selection */}
+      {step === 2 && selectedDate && (
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="text-center">
+              <h3 className="text-2xl font-semibold text-gray-900">Elegí tu horario</h3>
+              <p className="text-sm text-gray-600 capitalize mt-1">{formatDisplayDate(selectedDate)}</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : (
+              <AvailableList slots={slots ?? []} selected={selectedTime} onSelect={handleSelectTime} />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Step 3: Booking Form */}
+      {step === 3 && selectedDate && selectedTime && (
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div className="text-center">
+              <h3 className="text-2xl font-semibold text-gray-900">Confirmá tu turno</h3>
+              <p className="text-sm text-gray-600 mt-1">Ingresá tus datos para finalizar</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+            {/* Selected appointment summary */}
+            <div className="mb-6 p-4 bg-white rounded-lg border border-blue-200">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Horarios</h3>
-                  <p className="text-sm text-gray-600 capitalize">{formatDisplayDate(selectedDate)}</p>
+                <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">Turno seleccionado</p>
+                  <p className="text-sm text-gray-600 capitalize">
+                    {formatDisplayDate(selectedDate)} a las {selectedTime}
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 h-fit">
-                {loading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre completo
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  placeholder="Tu nombre y apellido"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                  Teléfono
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  placeholder="Tu número de teléfono"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                />
+              </div>
+
+              <button
+                disabled={!name.trim() || !phone.trim() || isSubmitting}
+                onClick={handleSubmit}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Confirmando...</span>
                   </div>
                 ) : (
-                  <AvailableList slots={slots ?? []} selected={selectedTime} onSelect={handleSelectTime} />
+                  'Confirmar reserva'
                 )}
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full min-h-[400px] bg-gray-50 rounded-xl border border-gray-200">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 font-medium">Primero elegí una fecha</p>
-                <p className="text-gray-400 text-sm mt-1">Los horarios aparecerán aquí</p>
-              </div>
+              </button>
             </div>
-          )}
+          </div>
         </div>
+      )}
 
-        {/* Booking Form Section */}
-        <div className="xl:col-span-1 space-y-4">
-          {selectedTime ? (
-            <>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Tus datos</h3>
-                  <p className="text-sm text-gray-600">Confirmá tu turno</p>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
-                {/* Selected appointment summary */}
-                <div className="mb-6 p-4 bg-white rounded-lg border border-blue-200">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">Turno seleccionado</p>
-                      <p className="text-sm text-gray-600 capitalize">
-                        {formatDisplayDate(selectedDate!)} a las {selectedTime}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                      Nombre completo
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="Tu nombre y apellido"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                      Teléfono
-                    </label>
-                    <input
-                      id="phone"
-                      type="tel"
-                      placeholder="Tu número de teléfono"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                    />
-                  </div>
-
-                  <button
-                    disabled={!name.trim() || !phone.trim() || isSubmitting}
-                    onClick={handleSubmit}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed font-medium text-lg"
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center justify-center space-x-2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <span>Confirmando...</span>
-                      </div>
-                    ) : (
-                      'Confirmar reserva'
-                    )}
-                  </button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full min-h-[400px] bg-gray-50 rounded-xl border border-gray-200">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <p className="text-gray-500 font-medium">Elegí fecha y horario</p>
-                <p className="text-gray-400 text-sm mt-1">El formulario aparecerá aquí</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Messages - Now as a fixed notification */}
+      {/* Messages - Fixed notification */}
       {message && (
         <div className="fixed top-4 right-4 z-50 max-w-md animate-fade-in">
           <div className={`rounded-lg p-4 shadow-lg ${

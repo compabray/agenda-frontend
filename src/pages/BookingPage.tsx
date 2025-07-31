@@ -28,7 +28,7 @@ export default function BookingPage() {
 
       {/* Main content */}
       <div className="relative -mt-6 px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-[90%]">
+        <div className="mx-auto max-w-6xl">
           <div className="rounded-2xl bg-white shadow-xl ring-1 ring-gray-900/5 backdrop-blur-sm">
             <div className="p-8 sm:p-12">
               <BookingWidget businessId={BUSINESS_ID} />
