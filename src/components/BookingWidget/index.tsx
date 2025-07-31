@@ -3,8 +3,7 @@ import { api } from '../../utils/api';
 import { useFetch } from '../../hooks/useFetch';
 import AllSlotsCalendar from './AllSlotsCalendar';
 import AvailableList from './AvailableList';
-import type { AvailableResponse } from './types';
-import { format } from 'date-fns';
+import type { AvailableResponse, SlotWithStatus } from './types';import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 interface Props { 
@@ -27,7 +26,7 @@ export default function BookingWidget({ businessId }: Props) {
       .then((res) => ({ data: res.data.slots }));
   }, [businessId, selectedDate]);
 
-  const { data: slots = [], loading } = useFetch<string[]>(fetchSlots);
+const { data: slots = [], loading } = useFetch<SlotWithStatus[]>(fetchSlots);
 
   const handleSelectDate = (date: string) => {
     setSelectedDate(date);

@@ -1,12 +1,15 @@
 import React from 'react';
+import type { SlotWithStatus } from './types';
 
 interface Props {
-  slots: string[];
+  slots: SlotWithStatus[];
   selected: string | null;
   onSelect: (t: string) => void;
 }
 
 export default function AvailableList({ slots, selected, onSelect }: Props) {
+  const availableSlots = slots.filter(slot => slot.available);
+  
   if (!slots.length) {
     return (
       <div className="text-center py-8">
@@ -24,22 +27,38 @@ export default function AvailableList({ slots, selected, onSelect }: Props) {
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-600 font-medium">
-        {slots.length === 1 ? '1 horario disponible' : `${slots.length} horarios disponibles`}
+        {availableSlots.length === 1 
+          ? '1 horario disponible' 
+          : `${availableSlots.length} horarios disponibles`
+        }
+        {slots.length > availableSlots.length && (
+          <span className="text-gray-400 ml-1">
+            ({slots.length - availableSlots.length} ocupados)
+          </span>
+        )}
       </p>
       
       <div className="grid grid-cols-2 gap-2">
-        {slots.map((time) => (
+        {slots.map((slot) => (
           <button
-            key={time}
-            onClick={() => onSelect(time)}
-            className={`relative overflow-hidden px-3 py-2.5 rounded-lg border-2 font-medium text-sm transition-all duration-200 transform hover:scale-105 ${
-              selected === time
-                ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md scale-105'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm'
+            key={slot.time}
+            onClick={() => slot.available && onSelect(slot.time)}
+            disabled={!slot.available}
+            className={`relative overflow-hidden px-3 py-2.5 rounded-lg border-2 font-medium text-sm transition-all duration-200 ${
+              !slot.available
+                ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+                : selected === slot.time
+                ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md scale-105 transform hover:scale-105'
+                : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm transform hover:scale-105'
             }`}
           >
-            <span className="relative z-10">{time}</span>
-            {selected === time && (
+            <span className="relative z-10">
+              {slot.time}
+              {!slot.available && (
+                <span className="block text-xs mt-0.5 text-gray-400">Ocupado</span>
+              )}
+            </span>
+            {selected === slot.time && slot.available && (
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-blue-600/10"></div>
             )}
           </button>
@@ -53,6 +72,11 @@ export default function AvailableList({ slots, selected, onSelect }: Props) {
           </svg>
           <p className="text-xs text-blue-700">
             Elegí tu horario preferido. Los turnos duran aprox. 40 min.
+            {slots.some(s => !s.available) && (
+              <span className="block mt-1 text-gray-600">
+                Los horarios en gris ya están ocupados.
+              </span>
+            )}
           </p>
         </div>
       </div>
