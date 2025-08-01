@@ -122,10 +122,35 @@
     @apply animate-pulse;
   }
   
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
   .gradient-border {
     background: linear-gradient(white, white) padding-box,
                 linear-gradient(45deg, #3b82f6, #8b5cf6) border-box;
     border: 2px solid transparent;
+  }
+}
+
+/* ───────── Keyframe Animations ───────── */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
   }
 }
 
@@ -165,14 +190,5 @@
   .loading-pulse {
     @apply animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 bg-[length:200%_100%];
     animation: loading-shimmer 1.5s infinite;
-  }
-}
-
-@keyframes loading-shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
   }
 }
